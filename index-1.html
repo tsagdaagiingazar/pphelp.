@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Сэтгэл зүйчийн туслах | СХДЦГ</title>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+ 
+:root {
+  --navy:    #0B2545;
+  --navy2:   #163860;
+  --gold:    #C9A84C;
+  --gold-lt: #E8C97A;
+  --silver:  #E8EDF4;
+  --white:   #FFFFFF;
+  --text:    #1A2A3A;
+  --muted:   #6B7C93;
+  --danger:  #C0392B;
+  --success: #1A7A4A;
+  --card-bg: #F5F8FC;
+}
+ 
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--navy);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, #1e3f6e 0%, transparent 70%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(201,168,76,0.03) 40px,
+      rgba(201,168,76,0.03) 41px
+    );
+  position: relative;
+  overflow: hidden;
+}
+ 
+/* Decorative shield watermark */
+body::before {
+  content: '⚖';
+  position: fixed;
+  font-size: 480px;
+  color: rgba(255,255,255,0.018);
+  right: -80px;
+  bottom: -60px;
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+}
+ 
+.container {
+  width: 100%;
+  max-width: 430px;
+  background: var(--white);
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px rgba(201,168,76,0.18),
+    0 32px 80px rgba(0,0,0,0.45),
+    0 8px 24px rgba(0,0,0,0.25);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+ 
+/* ── SCREENS ── */
+.screen{display:none;flex-direction:column;}
+.screen.active{display:flex;}
+ 
+/* ══════════════ STEP 1 ══════════════ */
+.hero {
+  background: var(--navy);
+  background-image: linear-gradient(160deg, #163860 0%, #0B2545 60%);
+  padding: 36px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+ 
+.emblem-wrap {
+  width: 76px; height: 76px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 2px solid rgba(201,168,76,0.35);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: 0 0 0 6px rgba(201,168,76,0.07);
+}
+.emblem-wrap img{width:52px;height:52px;object-fit:contain;}
+ 
+.org-name {
+  font-size: 9.5px; letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--gold-lt);
+  text-align: center;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.hero-title {
+  font-size: 14.5px; font-weight: 700;
+  color: var(--white);
+  text-align: center;
+  line-height: 1.5;
+}
+ 
+/* ── body sections ── */
+.step-body {
+  padding: 24px 22px 30px;
+  display: flex; flex-direction: column; gap: 18px;
+  background: var(--white);
+}
+ 
+/* Progress */
+.progress {
+  display: flex; gap: 5px;
+}
+.prog-dot {
+  flex: 1; height: 3px; border-radius: 2px;
+  background: #DDE4EF;
+  transition: background .3s;
+}
+.prog-dot.on { background: var(--gold); }
+ 
+/* Field */
+.field-label {
+  font-size: 10.5px; font-weight: 700;
+  color: var(--muted); letter-spacing: .8px;
+  text-transform: uppercase; margin-bottom: 7px;
+}
+.styled-select {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid #DDE4EF;
+  border-radius: 12px;
+  font-size: 13.5px; color: var(--text);
+  background: var(--card-bg); outline: none;
+  cursor: pointer;
+  transition: border-color .2s, box-shadow .2s;
+  font-family: inherit;
+}
+.styled-select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,.12);
+}
+ 
+/* CTA button */
+.cta-btn {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--navy2), var(--navy));
+  color: var(--white);
+  border: none; border-radius: 12px;
+  font-size: 14.5px; font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity .2s, transform .1s;
+  box-shadow: 0 4px 14px rgba(11,37,69,.25);
+  position: relative; overflow: hidden;
+}
+.cta-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 20%; right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-lt), transparent);
+  border-radius: 1px;
+}
+.cta-btn:hover{opacity:.92;}
+.cta-btn:active{transform:scale(.98);}
+.cta-btn.disabled{opacity:.38;pointer-events:none;}
+.cta-btn svg{width:17px;height:17px;flex-shrink:0;}
+ 
+/* ══════════════ STEP 2 ══════════════ */
+.s2-header {
+  background: linear-gradient(160deg, #163860 0%, #0B2545 100%);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  position: relative;
+}
+.s2-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.icon-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  color: var(--white); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background .2s;
+}
+.icon-btn:hover{background:rgba(255,255,255,.18);}
+.icon-btn svg{width:17px;height:17px;}
+.s2-htitle{font-size:13.5px;font-weight:700;color:var(--white);flex:1;}
+.s2-hsub{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:2px;}
+ 
+/* Tasag grid */
+.tasag-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.tasag-card {
+  border: 1.5px solid #DDE4EF;
+  border-radius: 14px; padding: 14px 10px;
+  cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+  transition: border-color .18s, background .18s, box-shadow .18s;
+  background: var(--card-bg);
+}
+.tasag-card:hover {
+  border-color: #B8C8DC;
+  background: #EDF3FA;
+  box-shadow: 0 2px 8px rgba(11,37,69,.08);
+}
+.tasag-card.sel {
+  border-color: var(--gold);
+  background: #FBF6E9;
+  box-shadow: 0 0 0 3px rgba(201,168,76,.12);
+}
+.tc-icon{font-size:22px;transition:transform .18s;}
+.tasag-card.sel .tc-icon{transform:scale(1.15);}
+.tc-name {
+  font-size: 10.5px; font-weight: 600;
+  color: var(--muted); text-align: center;
+  line-height: 1.4; transition: color .18s;
+}
+.tasag-card.sel .tc-name{color:var(--navy);}
+ 
+/* ══════════════ CHAT ══════════════ */
+#chat-screen{padding:0;min-height:580px;}
+ 
+.chat-header {
+  background: linear-gradient(160deg, #163860 0%, #0B2545 100%);
+  padding: 13px 15px;
+  display: flex; align-items: center; gap: 10px;
+  position: relative;
+}
+.chat-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.bot-avatar {
+  width: 38px; height: 38px; border-radius: 12px;
+  background: rgba(201,168,76,.15);
+  border: 1.5px solid rgba(201,168,76,.3);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.bot-avatar svg{width:20px;height:20px;}
+.hdr-name{font-size:13.5px;font-weight:700;color:var(--white);}
+.hdr-status{
+  font-size:10.5px;color:rgba(255,255,255,.5);
+  display:flex;align-items:center;gap:5px;margin-top:2px;
+}
+.online-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#4ade80;
+  box-shadow:0 0 5px #4ade80;
+  display:inline-block;
+}
+.hdr-tag {
+  background: rgba(201,168,76,.15);
+  border: 1px solid rgba(201,168,76,.3);
+  border-radius: 8px; padding: 4px 10px;
+  font-size: 10.5px; font-weight: 700;
+  color: var(--gold-lt);
+  margin-left: auto;
+}
+ 
+/* chatbox */
+#chatbox {
+  flex:1; padding:14px 13px;
+  overflow-y:auto;
+  background: var(--silver);
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(11,37,69,.04) 0%, transparent 50%);
+  display:flex; flex-direction:column; gap:9px;
+  min-height:340px; max-height:340px;
+}
+ 
+.message {
+  padding: 11px 14px;
+  border-radius: 18px;
+  max-width: 83%;
+  font-size: 13.5px;
+  line-height: 1.58;
+  word-wrap: break-word;
+  white-space: pre-line;
+}
+.bot {
+  background: var(--white);
+  align-self: flex-start;
+  border: 1px solid #DDE4EF;
+  border-bottom-left-radius: 4px;
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.user {
+  background: linear-gradient(135deg, var(--navy2), var(--navy));
+  color: var(--white);
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 8px rgba(11,37,69,.2);
+}
+ 
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;}
+.chip {
+  border: 1.5px solid var(--navy);
+  color: var(--navy);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 11.5px; font-weight: 600;
+  cursor: pointer; background: transparent;
+  transition: .18s; font-family: inherit;
+}
+.chip:hover{background:var(--navy);color:var(--white);}
+ 
+/* Typing */
+.typing-indicator {
+  display:flex;gap:4px;align-items:center;
+  padding:11px 14px;
+  background:var(--white);
+  border:1px solid #DDE4EF;
+  border-radius:18px; border-bottom-left-radius:4px;
+  align-self:flex-start; width:56px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.typing-indicator span {
+  width:6px;height:6px;border-radius:50%;
+  background:#9DB0C4;
+  animation:bounce 1.2s infinite;
+}
+.typing-indicator span:nth-child(2){animation-delay:.18s;}
+.typing-indicator span:nth-child(3){animation-delay:.36s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+ 
+/* Feedback */
+.feedback-row{display:flex;gap:7px;align-self:flex-start;margin-top:-3px;}
+.fb-btn {
+  border:1.5px solid #DDE4EF;
+  background:var(--white);
+  border-radius:20px; padding:4px 11px;
+  font-size:11px; cursor:pointer;
+  color:var(--muted); font-family:inherit;
+  transition:.18s; display:flex; align-items:center; gap:4px;
+}
+.fb-btn:hover{background:#EDF3FA;border-color:#B8C8DC;color:var(--navy);}
+.fb-btn.voted{background:#FBF6E9;border-color:var(--gold);color:var(--navy);pointer-events:none;}
+ 
+/* SOS row */
+.sos-row {
+  padding:9px 13px;
+  background:var(--white);
+  border-top:1px solid #EEF2F7;
+  display:flex;gap:8px;
+}
+.sos-btn {
+  flex:1;border-radius:10px;padding:9px 6px;
+  font-size:11.5px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  border:none;transition:opacity .2s;font-family:inherit;
+}
+.sos-btn:active{opacity:.8;}
+.sos-danger{background:#FEF2F2;color:var(--danger);border:1.5px solid #FECACA;}
+.sos-calm{background:#F0FDF4;color:var(--success);border:1.5px solid #BBF7D0;}
+.sos-btn svg{width:14px;height:14px;}
+ 
+/* Input */
+.input-area {
+  padding:11px 13px;
+  background:var(--white);
+  display:flex;gap:9px;align-items:center;
+  border-top:1px solid #EEF2F7;
+}
+.input-area input {
+  flex:1;padding:11px 16px;
+  border:1.5px solid #DDE4EF;
+  border-radius:24px;
+  font-size:13.5px;background:var(--card-bg);
+  outline:none;color:var(--text);
+  font-family:inherit;
+  transition:border-color .2s, box-shadow .2s;
+}
+.input-area input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(201,168,76,.1);
+}
+.send-btn {
+  width:38px;height:38px;border-radius:12px;
+  background:linear-gradient(135deg,var(--navy2),var(--navy));
+  border:none;color:var(--white);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:.18s;flex-shrink:0;
+  box-shadow:0 3px 10px rgba(11,37,69,.2);
+}
+.send-btn:hover{opacity:.88;}
+.send-btn:active{transform:scale(.95);}
+.send-btn svg{width:17px;height:17px;}
+ 
+/* Welcome button */
+.welcome-btn {
+  display:inline-block;margin-top:10px;
+  padding:9px 14px;border-radius:20px;
+  border:2px solid var(--gold);
+  background:var(--white);
+  color:var(--navy);cursor:pointer;
+  font-weight:700;font-size:12.5px;
+  transition:.2s;line-height:1.4;
+  font-family:inherit;
+}
+.welcome-btn:hover{background:var(--gold);color:var(--white);}
+ 
+/* Scrollbar */
+#chatbox::-webkit-scrollbar{width:4px;}
+#chatbox::-webkit-scrollbar-track{background:transparent;}
+#chatbox::-webkit-scrollbar-thumb{background:#C8D4E0;border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="container">
+ 
+<!-- ══ STEP 1 ══ -->
+<div id="step1" class="screen active">
+  <div class="hero">
+    <div class="emblem-wrap">
+      <img src="police.png" alt="Цагдаагийн лого"/>
+    </div>
+    <div class="org-name">Сонгинохайрхан дүүргийн цагдаагийн газар</div>
+    <div class="hero-title">Сэтгэл зүйчийн туслах</div>
+  </div>
+  <div class="step-body">
+    <div class="progress">
+      <div class="prog-dot on"></div>
+      <div class="prog-dot"></div>
+      <div class="prog-dot"></div>
+    </div>
+    <div>
+      <div class="field-label">Харъяа хэлтэс</div>
+      <select id="heltesSelect" class="styled-select">
+        <option value="" disabled selected>— Сонгоно уу —</option>
+        <option value="I-р хэлтэс">СХД цагдаагийн I-р хэлтэс</option>
+        <option value="II-р хэлтэс">СХД цагдаагийн II-р хэлтэс</option>
+        <option value="III-р хэлтэс">СХД цагдаагийн III-р хэлтэс</option>
+        <option value="Цагдаагийн газар">СХД цагдаагийн газар</option>
+      </select>
+    </div>
+    <button class="cta-btn" onclick="goToStep2()">
+      Үргэлжлүүлэх
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+    </button>
+  </div>
+</div>
+ 
+<!-- ══ STEP 2 ══ -->
+<div id="step2" class="screen">
+  <div class="s2-header">
+    <button class="icon-btn" onclick="backToStep1()">
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>
+    </button>
+    <div>
+      <div class="s2-htitle">Тасаг сонгох</div>
+      <div class="s2-hsub">Алба хаагчийн мэдээлэл</div>
+    </div>
+  </div>
+  <div class="step-body">
+    <div class="progress">
+      <div class="prog-dot on"></div>
+      <div class="prog-dot on"></div>
+      <div class="prog-dot"></div>
+    </div>
+    <div class="field-label">Тасгаа сонгоно уу</div>
+    <div class="tasag-grid">
+      <div class="tasag-card" onclick="selectTasag(this,'ЭЦТ')"><span class="tc-icon">🔍</span><div class="tc-name">Эрүүгийн цагдаагийн тасаг (ЭЦТ)</div></div>
+      <div class="tasag-card" onclick="selectTasag(this,'МШТ')"><span class="tc-icon">📋</span><div class="tc-name">Мөрдөн шалгах тасаг (МШТ)</div></div>
+      <div class="tasag-card" onclick="selectTasag(this,'ГХЗШТ')"><span class="tc-icon">⚖️</span><div class="tc-name">Гэмт хэрэг зөрчил шалгах тасаг(ГХЗШТ)</div></div>
+      <div class="tasag-card" onclick="selectTasag(this,'УСШУТ')"><span class="tc-icon">🚨</span><div class="tc-name">Урьдчилан сэргийлэх шуурхай удирдлагын тасаг (УСШУТ)</div></div>
+      <div class="tasag-card" onclick="selectTasag(this,'НХЖТ')"><span class="tc-icon">🛡️</span><div class="tc-name">Нийтийн хэв журам хамгаалах, олон нийтийн аюулгүй байдлыг хангах тасаг(НХЖХОНАБХТ)</div></div>
+      <div class="tasag-card" onclick="selectTasag(this,'ЗУТ')"><span class="tc-icon">🏢</span><div class="tc-name">Захиргаа удирдлагын тасаг (ЗУТ)</div></div>
+    </div>
+    <button class="cta-btn disabled" id="enterBtn" onclick="startChat()">
+      Нэвтрэх
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
+    </button>
+  </div>
+</div>
+ 
+<!-- ══ CHAT ══ -->
+<div id="chat-screen" class="screen">
+  <div class="chat-header">
+    <div class="bot-avatar">
+      <svg fill="none" stroke="#C9A84C" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>
+      </svg>
+    </div>
+    <div style="flex:1">
+      <div class="hdr-name">Сэтгэлзүйн туслах</div>
+      <div class="hdr-status"><span class="online-dot"></span>Нууцлалтай · Онлайн</div>
+    </div>
+    <div class="hdr-tag" id="info-display">—</div>
+    <button class="icon-btn" style="margin-left:8px" onclick="location.reload()">
+      <svg fill="none" stroke="white" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+    </button>
+  </div>
+ 
+  <div id="chatbox"></div>
+ 
+  <div class="sos-row">
+    <button class="sos-btn sos-danger" onclick="sendQuickMsg('Яаралтай тусламж хэрэгтэй байна')">
+      <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
+      Яаралтай
+    </button>
+    <button class="sos-btn sos-calm" onclick="sendQuickMsg('Амьсгалын дасгал хийхийг хүсч байна')">
+      <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>
+      Тайвшруулах
+    </button>
+  </div>
+ 
+  <div class="input-area">
+    <input id="inputBox" type="text" placeholder="Асуултаа бичнэ үү..." onkeydown="if(event.key==='Enter')sendMessage()"/>
+    <button class="send-btn" onclick="sendMessage()">
+      <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"/></svg>
+    </button>
+  </div>
+</div>
+ 
+</div><!-- /container -->
+ 
+<script>
+/* ── Firebase ── */
+const firebaseConfig = {
+  apiKey:"AIzaSyAHlCPV1W94joiPxgf1QiZoUfw88McMh6k",
+  authDomain:"police-psych-bot-data.firebaseapp.com",
+  databaseURL:"https://police-psych-bot-data-default-rtdb.firebaseio.com",
+  projectId:"police-psych-bot-data",
+  storageBucket:"police-psych-bot-data.firebasestorage.app",
+  messagingSenderId:"277700500098",
+  appId:"1:277700500098:web:2a4cd584f7b7ec2fdeb29b"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+ 
+let heltes="", tasag="";
+ 
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goToStep2(){
+  heltes=document.getElementById('heltesSelect').value;
+  if(!heltes){alert("Хэлтэс сонгоно уу!");return;}
+  show('step2');
+}
+function backToStep1(){show('step1');}
+function selectTasag(el,val){
+  document.querySelectorAll('.tasag-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); tasag=val;
+  document.getElementById('enterBtn').classList.remove('disabled');
+}
+function startChat(){
+  if(!tasag){alert("Тасагаа сонгоно уу!");return;}
+  show('chat-screen');
+  document.getElementById('info-display').textContent=tasag;
+  const cb=document.getElementById('chatbox');
+  cb.innerHTML='';
+  const w=document.createElement('div');
+  w.className='message bot';
+  w.innerHTML='Сайн байна уу? <b>'+tasag+'</b>-ийн алба хаагч, танд энэ өдрийн мэнд хүргэе. 💙<br><br>'+
+    '<b>Санамж:</b> Кирил үсгээр бичнэ үү.<br><br>'+
+    '<button class="welcome-btn" onclick="sendQuickMsg(\'Мэдрэмжээ хуваалцах уу\')">💬 Мэдрэмжээ хуваалцах уу?</button>';
+  cb.appendChild(w);
+  const cr=document.createElement('div');
+  cr.className='chip-row';
+  ['Стресс','Нойр','Уур','Ядаргаа','Гэр бүл','Тусламж','Амьсгал','Сэтгэл зүйч'].forEach(c=>{
+    const b=document.createElement('button');
+    b.className='chip'; b.textContent=c;
+    b.onclick=()=>sendQuickMsg(c);
+    cr.appendChild(b);
+  });
+  cb.appendChild(cr);
+  cb.scrollTop=cb.scrollHeight;
+}
+ 
+function addMessage(html,sender){
+  const cb=document.getElementById('chatbox');
+  const d=document.createElement('div');
+  d.className='message '+sender;
+  if(sender==='bot'){d.innerHTML=html;}else{d.textContent=html;}
+  cb.appendChild(d);
+  if(sender==='bot'){
+    const fr=document.createElement('div');
+    fr.className='feedback-row';
+    fr.innerHTML='<button class="fb-btn" onclick="saveFeedback(this,\'helpful\')">👍 Тус болсон</button>'+
+      '<button class="fb-btn" onclick="saveFeedback(this,\'not_helpful\')">👎 Болоогүй</button>';
+    cb.appendChild(fr);
+  }
+  cb.scrollTop=cb.scrollHeight;
+}
+function saveFeedback(btn,type){
+  btn.parentElement.querySelectorAll('.fb-btn').forEach(b=>b.classList.remove('voted'));
+  btn.classList.add('voted');
+  btn.textContent=type==='helpful'?'👍 Баярлалаа!':'👎 Тэмдэглэлээ';
+  db.ref('feedback/').push({heltes,tasag,type,timestamp:new Date().toLocaleString()});
+}
+function showTyping(){
+  const cb=document.getElementById('chatbox');
+  const t=document.createElement('div');
+  t.className='typing-indicator';
+  t.innerHTML='<span></span><span></span><span></span>';
+  cb.appendChild(t); cb.scrollTop=cb.scrollHeight; return t;
+}
+function saveToFirebase(text){
+  if(!text.trim())return;
+  db.ref('messages/').push({heltes,tasag,question:text,timestamp:new Date().toLocaleString()});
+}
+function sendQuickMsg(msg){
+  saveToFirebase(msg); addMessage(msg,'user');
+  const t=showTyping();
+  setTimeout(()=>{t.remove();addMessage(getBotReply(msg),'bot');},650);
+}
+function sendMessage(){
+  const ib=document.getElementById('inputBox');
+  const ui=ib.value.trim(); if(!ui)return;
+  saveToFirebase(ui); addMessage(ui,'user'); ib.value='';
+  const t=showTyping();
+  setTimeout(()=>{t.remove();addMessage(getBotReply(ui),'bot');},700);
+}
+</script>
+ 
+<script>
+/* ════════════════════════════════════════
+   ХАРИУЛТЫН САН + ОЛОН АЛХАМТ ЛОГИК
+   ════════════════════════════════════════ */
+let CS={topic:null,step:0,last:null};
+function RS(){CS={topic:null,step:0,last:null};}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+ 
+const R={
+  greeting:[
+    "Сайн байна уу? Та надтай чөлөөтэй ярьж болно — бүх зүйл нууцлагдана. Өнөөдөр юу мэдэрч байна вэ?",
+    "Мэнд! Ажлын стресс, нойр, гэр бүл — аль сэдвээр ч ярилцаж болно. Юу санаа зовоож байна вэ?",
+    "Сайн байна уу? Надад хандсанд баярлалаа. Одоогийн байдлаараа яаж мэдэрч байна вэ?"
+  ],
+ 
+  /* BURNOUT */
+  burnout0:[
+    "Ажлаасаа гармаар байхын цаана юу байгааг хамтдаа ойлгоцгооё. Хамгийн их юу нь дарамт болж байна вэ?\n\n• Ажлын ачаалал хэт их\n• Хамт олон, удирдлагатай харилцаа\n• Ажлын утга учрыг олохгүй байна\n• Биеийн болон сэтгэлийн ядаргаа",
+    "Энэ мэдрэмж хэдий хугацаанаас байна вэ?\n\n• Нэг долоо хоног орчим\n• Нэг сараас дээш\n• Хэдэн сараас дээш",
+    "Ажлаасаа гармаар байна гэх мэдрэмж хүнд. Яг одоо хамгийн их юу нь ядраах шалтгаан болж байна вэ?"
+  ],
+  burnout1w:[
+    "Ачаалал, хамт олны харилцаа дарамт болж байгаа бол — тодорхой ямар зүйл хамгийн хүнд вэ?",
+    "Ажлын аль хэсэг нь хамгийн их сэтгэлийг чинь шавхаж байна вэ?",
+    "Хэрэв нэг зүйлийг л өөрчилж болвол юуг өөрчлөх байсан бэ?"
+  ],
+  burnout1t:[
+    "Нэг сараас дээш үргэлжилж байгаа бол энэ нь Burnout шинж байж болно. Нойр, идэх дуршил хэр байна вэ?",
+    "Удаан хугацаанд хуримтлагдсан ядаргаа байгаа юм байна. Амрах боломж гарч байна уу?"
+  ],
+  burnout2:[
+    "🔋 <b>Яг одоо хийж болох 3 жижиг алхам:</b><br><br>① Өдөрт 10 минут ганцаараа байх цаг гарга — кофе уу, алхаа<br>② Нэг долоо хоногт нэг дуртай зүйлээ хий<br>③ 'Үгүй' гэж хэлж сурах — энэ нь хариуцлагагүй биш, өөрийгөө хамгаалж байгаа хэрэг<br><br>Хэрхэн мэдэрч байна вэ одоо?",
+    "✨ <b>Утга учрыг дахин олох дасгал:</b><br><br>Өнөөдөр таны хийж буй ажлын ачаар иргэд болон гэр бүлийнхэн тань аюулгүй амар тайван амарч байна — тэр хүнийг бод. Нэг мөч ч гэсэн тэр утга учир байна.<br><br>Ядарч байгаа нь таны хайхрамжтай хандлагын тэмдэг. 💙",
+    "💡 <b>Burnout-аас гарах эхний алхам:</b><br><br>Биеийн хөдөлгөөн — өдөрт 20 минут алхах нь кортизолыг бууруулж, сэтгэлийн байдлыг эрс сайжруулдаг.<br><br>Маргааш нэг алхах боломж байна уу?"
+  ],
+  burnout3:[
+    "Та одоо илүү тайван болж байна уу? Сэтгэл зүйчтэй нэг удаа ярилцахыг бодож үзсэн үү? 📞 <b>8холбогдох утас: 80580883</b>",
+    "Хэрэв ядаргаа нь 3 сараас дээш үргэлжилж байгаа бол мэргэжлийн тусламж авах цаг болсон байж болно. 📞 <b> нэг холбогдоорой 80580883</b>"
+  ],
+ 
+  /* СТРЕСС */
+  stress0:[
+    "Танд хэцүү байгааг ойлгож байна. 💙 Энэ мэдрэмж хэдий хугацаанаас үргэлжилж байна вэ?\n\n• Өнөөдөр эхэлсэн\n• Нэг долоо хоног болсон\n• Нэг сараас дээш",
+    "Стресс мэдрэх нь бие нь танд дохио өгч байна. Хамгийн их юу дарамт болж байна вэ?\n\n• Ажлын ачаалал\n• Хамт ажиллагсадтай харилцаа\n• Гэр бүлийн асуудал\n• Санхүүгийн асуудал",
+    "Ойлгож байна. Стресс хаанаас ирж байгааг тодруулъя — одоо хамгийн их юу дарамт болж байна вэ?"
+  ],
+  stress1s:[
+    "Өнөөдөр эхэлсэн бол тодорхой шалтгаан байж болно. Ямар нэг зүйл болсон уу? Дурдахыг хүсвэл ярьж болно.",
+    "Шинэ стресс байвал хамтдаа авч үзье. Яг юу болсон бэ?"
+  ],
+  stress1l:[
+    "Нэг сараас дээш үргэлжилж байгаа бол энэ чухал анхаарал шаарддаг. Нойр хэр байна вэ?",
+    "Удаан үргэлжилсэн стресс биед мөн нөлөөлдөг. Толгой өвдөх, нурууны өвчин, ядрах зэрэг байна уу?"
+  ],
+  stress2:[
+    "🌬️ <b>4-7-8 амьсгалын арга — яг одоо хийцгээе:</b><br><br>① Хамраар <b>4 секунд</b> амьсгал ав<br>② <b>7 секунд</b> барь<br>③ Амаар <b>8 секунд</b> гарга<br><br>3 удаа давтаад хэрхэн мэдэрч байгаагаа хэлнэ үү. 🙂",
+    "🧠 <b>5-4-3-2-1 газардуулга техник:</b><br><br>👁 Харах <b>5</b> зүйл нэрлэ<br>✋ Хүрч болох <b>4</b> зүйл<br>👂 Сонсох <b>3</b> чимээ<br>👃 Үнэрлэх <b>2</b> зүйл<br>👅 Амтлах <b>1</b> зүйл<br><br>Тархийг стрессээс салгаж одоо цагт авчирна.",
+    "💪 <b>Прогрессив булчингийн тайвшрал:</b><br><br>① Хоёр гараа нударгалан 10 секунд чангал<br>② Гэнэт сулал — ялгааг мэдэр<br>③ Мөр, хүзүү, хөлөөр давт<br><br>Биеийн хурдсал суларч, тайвшрал ирнэ."
+  ],
+  stress3:[
+    "Та маш их ачааг дангаараа үүрч байна. Хамт ажиллагсадтайгаа энэ тухай ярилцаж байна уу?",
+    "Сэтгэл зүйчтэй нэг удаа ч гэсэн ярилцаж үзсэн үү? 📞 <b>80580883</b> — нууцлагдана."
+  ],
+ 
+  /* НОЙР */
+  sleep0:[
+    "Нойрны асуудал ямар байна вэ?\n\n• Унтаж чадахгүй байна\n• Унтаад сэрж байна\n• Зүүдэндээ хар дарж байна\n• Нойр хэт дутуу байна",
+    "Нойрны хямрал хэзээнээс эхэлсэн бэ? Ажлын ээлж өөрчлөгдсөн, эсвэл тодорхой нэг зүйл болсон уу?",
+    "Сүүлийн үед хэдэн цаг унтаж байна вэ? Хэдэн цаг хангалттай мэдрэгдэж байна вэ?"
+  ],
+  sleep1t:[
+    "Унтаж чадахгүй байвал тархи идэвхтэй байгаа гэсэн үг. Орондоо орохдоо ямар юу боддог вэ?",
+    "Унтахаасаа өмнө юу хийдэг вэ? Утас харах, ТВ үзэх уу?"
+  ],
+  sleep1w:[
+    "Шөнө дунд сэрэх нь кортизол ихэссэний шинж байж болно. Сэрмэгц ямар мэдрэмж төрдөг вэ?",
+    "Хэдэн цагт сэрдэг вэ? Дахин унтаж чаддаг уу эсвэл хэцүү байдаг уу?"
+  ],
+  sleep1d:[
+    "Зүүдэнд ажлын хэрэг, аюулай нөхцөл харагддаг уу? Энэ нь цочролын дараах стрессийн шинж байж болно.",
+    "Зүүд нь бодит байдал шиг мэдрэгддэг үү? Сэрэхэд зүрх дэлсэж, хөлөрч байдаг уу?"
+  ],
+  sleep2:[
+    "😴 <b>Унтахын өмнөх алтан 3 дүрэм:</b><br><br>① Унтахаас <b>1 цагийн өмнө</b> бүх дэлгэцийг унтраа<br>② Өрөөгөө бүрэн харанхуйл, сэрүүн болго<br>③ 20 минут унтаж чадахгүй бол — бос, өөр өрөөнд суу, нойр хүрмэгц буцаж хэвт",
+    "🌙 <b>4-7-8 унтуулах амьсгал:</b><br><br>Хэвтэн нүдээ аниад:<br>① 4 секунд амьсгал ав<br>② 7 секунд барь<br>③ 8 секунд гарга<br><br>4 удаа давтахад бие унтахад бэлэн болно.",
+    "🪖 <b>Цэргийн 2 минутын унтах арга:</b><br><br>① Нүүрийн булчин бүрийг суллаа<br>② Мөр, гар, хөлийг суллаа<br>③ Тархинаасаа бодлыг хоослоод хоосон газар дүрс бод<br><br>АНУ-ын армид 96% нь энэ аргаар 2 минутад унтдаг."
+  ],
+  sleep3:[
+    "Нойрны асуудал 2-3 долоо хоноос дээш үргэлжилбэл эмчид хандаарай. Сэтгэл зүйч: 📞 <b>80580883</b>",
+    "Нойр сайжирч байна уу? Тайвшрах дасгал туршиж үзэхийг хүсвэл 'дасгал' гэж бичнэ үү."
+  ],
+ 
+  /* УУР */
+  anger0:[
+    "Уур мэдрэх нь хэвийн зүйл, ялангуяа хүнд нөхцөлд ажилладаг хүнд. Юу уурыг хөдөлгөж байна вэ?\n\n• Иргэдтэй харилцаа\n• Хамт ажиллагсад\n• Удирдлага\n• Гэр бүл\n• Өөр зүйл",
+    "Уур хаана, хэзээ хамгийн хүчтэй мэдрэгддэг вэ? Ажил дээр үү, гэртээ үү?",
+    "Уурласнаа мэдэрч байхдаа биед яаж мэдрэгддэг вэ? Зүрх дэлсэх, мөр хүзүү хөших, нүүр халуурах уу?"
+  ],
+  anger1c:[
+    "Иргэдтэй харилцаанд уурлах нь байнга тохиолддог. Тэд тан руу халдсан уу, эсвэл хамтран ажиллахгүй байсан уу?",
+    "Тэд таны дүрэмт хувцасыг л харж байгаа — таны хүн чанарыг биш гэдгийг санах нь тусалдаг уу?"
+  ],
+  anger1o:[
+    "Хамт ажиллагсадтай зөрчил гарвал хэцүү, маргалдах. Удаан хуримтлагдсан уу, эсвэл тодорхой нэг зүйлээс болсон уу?",
+    "Тэдэнтэй шууд ярилцах боломж байсан уу? Юу хэлэх байсан бэ?"
+  ],
+  anger2:[
+    "🧊 <b>Уурыг бууруулах 60 секунд:</b><br><br>① Хамраар гүнзгий амьсгаль, 4 секунд барь<br>② Амнаасаа аажим гарга<br>③ 'Энэ мэдрэмж өнгөрнө' гэж өөртөө хэл<br>④ Боломжтой бол орчноосоо 2 минут холдоо<br><br>Уурлаж байхдаа шийдвэр гаргахгүй байхыг хичээ.",
+    "💨 <b>Тактик амьсгал 4-4-4-4:</b><br><br>Тусгай хүчнийхэн ашигладаг арга:<br>① 4 секунд амьсгал ав<br>② 4 секунд барь<br>③ 4 секунд гарга<br>④ 4 секунд хүлээ<br><br>4 удаа давт. Кортизол буурч тархи тайвших боломж олдоно.",
+    "🚶 <b>Биеийн хөдөлгөөнөөр уурыг гаргах:</b><br><br>Боломжтой бол 5 минут хурдан алхаа — адреналин биеэс гарна.<br>Хэрэв боломжгүй бол — хажуур руугаа эргэж, нударгаа чангалаад суллаарай."
+  ],
+  anger3:[
+    "Уур удаан үргэлжилж, харилцаанд нөлөөлж байвал сэтгэл зүйчтэй ярилцаарай. 📞 <b>80580883</b>",
+    "Одоо бага арай тайван уу? Дараагийн удаа уурлахад хэрэглэх аргуудаа дурсаарай."
+  ],
+ 
+  /* TRAUMA */
+  trauma0:[
+    "Хүнд нөхцөл байдал харсны дараа тухайн зураг дахин нүдэнд харагдах нь хэвийн хариу үйлдэл. Хэдий удаан болж байна вэ?",
+    "Та сүүлд ямар нэг хүнд хэрэгт оролцсон уу? Тэр тухай ярихыг хүсвэл сонсоно — нууцлагдана.",
+    "Та ганцаараа биш — олон алба хаагч үүнтэй тулгардаг. Юу болсон бэ?"
+  ],
+  trauma1r:[
+    "Сүүлийн нэг сарын дотор болсон бол бие одоо боловсруулж байна. Унтахад тухайн дүрслэлүүд ирдэг үү?",
+    "Тэр үйл явдлын дараа хэн нэгэнтэй ярилцаж чадсан уу?"
+  ],
+  trauma1o:[
+    "Нэг сараас дээш үргэлжилж байгаа бол ПТСР-ийн шинж байж болно — мэргэжлийн тусламж авах нь зөв. 📞 <b>80580883</b>",
+    "Та маш хүнд зүйл үүрч байна. Мэргэжлийн тусламж авах нь хүч чадлын тэмдэг. 📞 <b>80580883</b>"
+  ],
+  trauma2:[
+    "🛡️ <b>Найдвартай газрын дасгал:</b><br><br>Нүдээ аниад өөрийн хамгийн тайван, аюулгүй газрыг төсөөл.<br>• Тэр газрын өнгийг харагтун<br>• Чимээг сонсогтун<br>• Агаарыг мэдрэгтун<br><br>2-3 минут тэр газарт байгаарай. Та одоо аюулгүй байна.",
+    "✍️ <b>Бичих терапи:</b><br><br>Болсон явдлыг дэвтэрт бич:<br>① Юу болсон бэ?<br>② Тэр үед юу мэдэрсэн бэ?<br>③ Одоо юу мэдэрч байна вэ?<br><br>Хэнд ч харуулахгүй — зөвхөн гадагшлуулах зорилгоор."
+  ],
+ 
+  /* ГЭР БҮЛ */
+  family0:[
+    "Гэр бүлийн асуудал ажлын стрестэй зэрэг дарах нь маш хүнд. Юу болж байна вэ?\n\n• Ойлголцохгүй байна\n• Маргаан ихсэж байна\n• Хүүхдүүдтэй цаг алдаж байна\n• Бусад",
+    "Гэр бүлийнхэн таны ажлыг ойлгодог уу? Ажлын нөхцөл байдлаа гэртээ ярьдаг уу?",
+    "Ажлаасаа гэртээ харихад ямар мэдрэмжтэй байдаг вэ? Тайвширдаг уу?"
+  ],
+  family1u:[
+    "Олон цагдаагийн алба хаагчийн гэр бүл ажлын нарийнийг ойлгодоггүй — хэвийн. Тэдэнд юу ойлгуулах хэрэгтэй гэж бодож байна вэ?",
+    "Гэр бүлийнхэнтэй ажлын маскаа тайлан ярилцах цаг гаргаж байна уу?"
+  ],
+  family2:[
+    "🏠 <b>Гэрийн босго давах дүрэм:</b><br><br>Гэртээ орохоосоо өмнө машиндаа 3 минут суу:<br>① 3 удаа гүнзгий амьсгаль<br>② 'Ажлаа машинд үлдээж байна' гэж өөртөө хэл<br>③ Хайртай хүмүүстээ зөвхөн 'өөрийгөө' авчир<br><br>Энэ жижиг зан үйл гэрийн уур амьсгалыг өөрчилдөг.",
+    "💬 <b>Гэр бүлтэй харилцах зөвлөмж:</b><br><br>• 'Өнөөдөр хэцүү өдөр байсан' гэж хэл<br>• 'Надад 20 минут хэрэгтэй' гэж хүс<br>• Амарсаны дараа гэр бүлдээ бүрэн анхаарлаа өгөөрэй<br><br>Тэд тайлбар биш, чи хэрэгтэй."
+  ],
+ 
+  /* МОТИВАЦИ */
+  motivation0:[
+    "Утга учраа алдсан мэдрэмж хэзээнээс ирж байна вэ?",
+    "Ажлын аль хэсэг нь одоо хамгийн утгагүй мэт санагдаж байна вэ?",
+    "Энэ ажилд орохдоо юу хүсэж байсан бэ? Тэр зорилго одоо хаана байна вэ?"
+  ],
+  motivationR:[
+    "Та нийгмийн аюулгүй байдлын тулд ажилладаг — бусад хүн унтаж байх үед та сэрүүн байдаг. Энэ нь ховор хүч чадал. 🦸",
+    "Ядаргаа нь утга учрын дайсан. Гэхдээ утга учир нуугдаад байгаа — алга болоогүй. Сүүлийн нэг сард таны ажлаар хэн нэгэнд тусалсан уу?",
+    "Та мэдрэмжтэй хүн учраас ядарч байна — энэ нь таны хүч. Жижиг ялалтуудаа тэмдэглэж эхлэх нь мотивацийг сэргээдэг."
+  ],
+ 
+  /* ПАНИК */
+  panicR:[
+    "🆘 Одоо 5-4-3-2-1 аргыг хий:<br><br>👁 Харж байгаа <b>5</b> зүйл нэрлэ<br>✋ Барьж байгаа <b>4</b> зүйл<br>👂 Сонсож байгаа <b>3</b> чимээ<br>👃 Үнэрлэж байгаа <b>2</b> зүйл<br>👅 Амт <b>1</b> зүйл<br><br>Та одоо аюулгүй байна. Амьсгалаа аажим гаргаарай.",
+    "Зүрх дэлсэж, амьсгал богиносч байна уу? Паник довтолгоо 10 минутад өнгөрнө.<br><br>Одоо: сандалдаа суу, хоёр гараа өвдөг дээрээ тавь, нүдээ аниад гүнзгий амьсгаль."
+  ],
+ 
+  /* АРХИ */
+  alcohol0:[
+    "Стрессийг тайлахын тулд архи хэрэглэдэг, гэхдээ урт хугацаанд бүр их стресс үүсгэдэг. Хэр их хэрэглэдэг вэ?",
+    "Архи ууснаар тайвширдаг уу? Тэр тайвшрал хэр удаан үргэлжилдэг вэ?"
+  ],
+  alcohol1:[
+    "Стресстэй үед 15 минут хурдан алхах нь биохимийн хувьд тусалдаг — эндорфин гарна. Туршиж үзсэн үү?",
+    "Та өдөр бүр архи хэрэглэх хүсэл мэдэрдэг үү? Мэргэжлийн дэмжлэг авахыг бодож үзсэн үү?"
+  ],
+ 
+  /* ДАРГА */
+  boss0:[
+    "Удирдлагатай холбоотой зүйл уу? Юу болсон бэ?",
+    "Дарга нь шүүмжилсэн үү, эсвээс ажлын ачаалал тэнцвэргүй байна уу?"
+  ],
+  boss1:[
+    "Шүүмжлэлийг хувь хүн рүүгээ биш, ажилдаа өгч байгаа зөвлөгөө гэж харахыг хичээ. Энэ нь хэцүү, гэхдээ сэтгэлийг хамгаалдаг.",
+    "Даргад өөрийн байр суурийг тайлбарлах боломж байсан уу? Ярилцлага хийх боломжтой юу?"
+  ],
+ 
+  /* ГЭМ БУРУУ */
+  guilt0:[
+    "Өөрийгөө буруутгаж байна уу? Юу болсон бэ?",
+    "Та тухайн үед чадах бүхнээ хийсэн гэдэгт итгэж байна уу?"
+  ],
+  guiltR:[
+    "Цагдаагийн ажилд бүх зүйлийг хянах боломжгүй. Та тухайн үеийн нөөц, мэдлэгийнхээ хүрээнд хамгийн сайнаараа хичээсэн. 💙",
+    "Өөрийгөө буруутгахын оронд: 'Дараагийн удаа юунд анхаарах вэ?' гэж асуух нь илүү эрүүл. Буруутгал = зогсонги байдал. Суралцах = хөгжил.",
+    "Та мэдрэмжтэй хүн учраас өөрийгөө буруутгаж байна. Энэ нь таны хүч — сул тал биш."
+  ],
+ 
+  /* ТУСГААРЛАЛТ */
+  social0:[
+    "Хүмүүсээс холдмоор байхын цаана юу байна вэ?",
+    "Хүмүүсийн дундаас гарахад амар байдаг уу? Тухайн цагт яаж мэдэрдэг вэ?"
+  ],
+  socialR:[
+    "Өөртөө нэг цаг гарга — дасгалын зааланд очих, ном уншихгүй байсан ч зүгээр. Зөвхөн 'өөрийнхөөрөө байх цаг. 🔋",
+    "Ганцаардал болон тусгаарлалт хоёр өөр зүйл. Ганцаараа байхыг сонгох нь — эрүүл. Тусгаарлалт нь мэдрэмж — тусламж шаарддаг. Та аль нь вэ?"
+  ],
+ 
+  /* ЯАРАЛТАЙ */
+  emergencyR:[
+    "🆘 <b>Та одоо аюулгүй газар байна уу?</b><br><br>Сэтгэл зүйн тусламж: <b>📞 80580883</b><br>Амь насанд аюул: <b>📞 102</b><br><br>Та надтай ярилцаж болно. Юу болж байна вэ?",
+    "🆘 Та ганцаараа биш. Яг одоо <b>80580883</b> руу залгаарай — танд туслахад бэлэн байна.<br><br>Эсвэл надтай энд ярилцаж болно. Юу мэдэрч байна вэ?"
+  ],
+ 
+  /* АМЬСГАЛ */
+  breathingR:[
+    "🌬️ <b>Хамт хийцгээе — 4-7-8 арга:</b><br><br>① Нүдээ аниад...<br>② Хамраар <b>4 секунд</b> амьсгал ав<br>③ <b>7 секунд</b> барь...<br>④ Амаар <b>8 секунд</b> гарга<br><br>3 удаа давтана уу. Дууссаны дараа яаж мэдэрч байгаагаа хэлнэ үү 🙂",
+    "🌬️ <b>Хайрцаг амьсгал 4-4-4-4:</b><br><br>① 4 секунд амьсгал ав<br>② 4 секунд барь<br>③ 4 секунд гарга<br>④ 4 секунд хүлээ<br><br>4 удаа давтаарай.",
+    "🌬️ <b>Энгийн тайвшруулах амьсгал:</b><br><br>Хамраар удаан амьсгал аваад... амнаасаа бүр удаан гарга.<br><br>Гаргах амьсгал нь авахаасаа <b>2 дахин удаан</b> байх ёстой — энэ нь тархинд тайвшрах дохио өгдөг."
+  ],
+ 
+  /* СЭТГЭЛ ЗҮЙЧ */
+  contactR:[
+    "Тайван гүнзгий амьсгал аваарай. 💙<br><br>Сэтгэл зүйдээ анхаарал хандуулах нь мэргэжлийн хариуцлага юм.<br><br>📞 <b>Сэтгэл зүйчийн утас: 80580883</b><br><br>Цаг товлоход туслахыг хүсвэл хэлнэ үү.",
+    "Мэргэжлийн тусламж авах нь хүч чадлын тэмдэг — сул доройх биш. 💙<br><br>📞 <b>80580883</b> — нууцлагдана, мэдэгдэхгүй."
+  ],
+ 
+  /* FALLBACK */
+  fallback:[
+    "Уучлаарай, би таныг сайн ойлгосонгүй. 🙏<br><br>Доорх үгсийн аль нэгийг бичиж үзнэ үү:<br><b>• ядарсан • стресс • уур • нойр • гэр бүл • дасгал • тусламж • ажлаасаа гармаар байна</b>",
+    "Надад бага зэрэг тодруулж хэлнэ үү. Та одоо хамгийн их юу мэдэрч байна вэ?",
+    "Та ямар сэдвийн талаар ярилцахыг хүсч байна вэ? Стресс, нойр, уур, гэр бүл, эсвэл өөр зүйл."
+  ]
+};
+ 
+function getBotReply(input){
+  const t=input.toLowerCase().trim();
+ 
+  /* Яаралтай */
+  if(/амиа хорлох|амиа хорлоно|үхмээр байна|амьд байхгүй байсан бол/.test(t)){RS();return pick(R.emergencyR);}
+  /* Паник */
+  if(/амьсгал боогдох|зүрх дэлсэх|үхэх юм шиг|паник/.test(t)){RS();return pick(R.panicR);}
+  /* Мэнд */
+  if(/сайн уу|мэнд|сайн байна уу/.test(t)){RS();return pick(R.greeting);}
+  /* Амьсгал */
+  if(/амьсгал|амьсгалын дасгал|тайвшруулах/.test(t)){return pick(R.breathingR);}
+  /* Сэтгэл зүйч */
+  if(/тусламж|сэтгэл зүйч|цаг авах|80580883|холбогдох/.test(t)){RS();return pick(R.contactR);}
+ 
+  /* ─ BURNOUT ─ */
+  if(/ажлаасаа гармаар|ажлаасаа гарах|ажилдаа явахгүй|шатаж|burnout|халшрах/.test(t)){
+    if(CS.topic!=='burnout'){CS={topic:'burnout',step:1,last:t};return pick(R.burnout0);}
+  }
+  if(CS.topic==='burnout'&&CS.step===1){
+    CS.step=2;
+    if(/ажил|ачаалал|хэцүү|дарга|хамт/.test(t))return pick(R.burnout1w);
+    return pick(R.burnout1t);
+  }
+  if(CS.topic==='burnout'&&CS.step===2){CS.step=3;return pick(R.burnout2);}
+  if(CS.topic==='burnout'&&CS.step===3){RS();return pick(R.burnout3);}
+ 
+  /* ─ СТРЕСС ─ */
+  if(/стресс|ядарч|ядаргаа|ачаалал|хэцүү байна|дарамт/.test(t)){
+    if(CS.topic!=='stress'){CS={topic:'stress',step:1,last:t};return pick(R.stress0);}
+  }
+  if(CS.topic==='stress'&&CS.step===1){
+    CS.step=2;
+    if(/өнөөдөр|дөнгөж/.test(t))return pick(R.stress1s);
+    if(/сар|удаан/.test(t))return pick(R.stress1l);
+    return pick(R.stress2);
+  }
+  if(CS.topic==='stress'&&CS.step===2){CS.step=3;return pick(R.stress2);}
+  if(CS.topic==='stress'&&CS.step===3){RS();return pick(R.stress3);}
+ 
+  /* ─ НОЙР ─ */
+  if(/нойр|унтаж|нойргүй|сэрэх|зүүд/.test(t)){
+    if(CS.topic!=='sleep'){CS={topic:'sleep',step:1,last:t};return pick(R.sleep0);}
+  }
+  if(CS.topic==='sleep'&&CS.step===1){
+    CS.step=2;
+    if(/унтаж чадахгүй|ороогүй/.test(t))return pick(R.sleep1t);
+    if(/сэрэх|сэрдэг/.test(t))return pick(R.sleep1w);
+    if(/зүүд/.test(t))return pick(R.sleep1d);
+    return pick(R.sleep2);
+  }
+  if(CS.topic==='sleep'&&CS.step===2){CS.step=3;return pick(R.sleep2);}
+  if(CS.topic==='sleep'&&CS.step===3){RS();return pick(R.sleep3);}
+ 
+  /* ─ УУР ─ */
+  if(/уур|бухимдал|тэсэхгүй|уурлаж|дургүй хүрэх/.test(t)){
+    if(CS.topic!=='anger'){CS={topic:'anger',step:1,last:t};return pick(R.anger0);}
+  }
+  if(CS.topic==='anger'&&CS.step===1){
+    CS.step=2;
+    if(/иргэд|хүн|гадны/.test(t))return pick(R.anger1c);
+    if(/хамт|дарга|ажил/.test(t))return pick(R.anger1o);
+    return pick(R.anger2);
+  }
+  if(CS.topic==='anger'&&CS.step===2){CS.step=3;return pick(R.anger2);}
+  if(CS.topic==='anger'&&CS.step===3){RS();return pick(R.anger3);}
+ 
+  /* ─ TRAUMA ─ */
+  if(/хэрэг|осол|аймшигтай|нүдэнд харагдаад|цочрол/.test(t)){
+    if(CS.topic!=='trauma'){CS={topic:'trauma',step:1,last:t};return pick(R.trauma0);}
+  }
+  if(CS.topic==='trauma'&&CS.step===1){
+    CS.step=2;
+    if(/сүүлд|саяхан/.test(t))return pick(R.trauma1r);
+    return pick(R.trauma1o);
+  }
+  if(CS.topic==='trauma'&&CS.step===2){RS();return pick(R.trauma2);}
+ 
+  /* ─ ГЭР БҮЛ ─ */
+  if(/гэр бүл|эхнэр|нөхөр|хүүхэд|маргаан|ойлгохгүй/.test(t)){
+    if(CS.topic!=='family'){CS={topic:'family',step:1,last:t};return pick(R.family0);}
+  }
+  if(CS.topic==='family'&&CS.step===1){
+    CS.step=2;
+    if(/ойлгохгүй|мэдэхгүй/.test(t))return pick(R.family1u);
+    return pick(R.family2);
+  }
+  if(CS.topic==='family'&&CS.step===2){RS();return pick(R.family2);}
+ 
+  /* ─ МОТИВАЦИ ─ */
+  if(/утгагүй|хэрэггүй|яах гэж|итгэлгүй|чадахгүй/.test(t)){
+    if(CS.topic!=='motivation'){CS={topic:'motivation',step:1,last:t};return pick(R.motivation0);}
+  }
+  if(CS.topic==='motivation'){RS();return pick(R.motivationR);}
+ 
+  /* ─ АРХИ ─ */
+  if(/архи|пиво|уумаар|согтууруулах/.test(t)){
+    if(CS.topic!=='alcohol'){CS={topic:'alcohol',step:1,last:t};return pick(R.alcohol0);}
+  }
+  if(CS.topic==='alcohol'&&CS.step===1){RS();return pick(R.alcohol1);}
+ 
+  /* ─ ДАРГА ─ */
+  if(/дарга|тушаал|шүүмжлэл|шударга бус/.test(t)){
+    if(CS.topic!=='boss'){CS={topic:'boss',step:1,last:t};return pick(R.boss0);}
+  }
+  if(CS.topic==='boss'&&CS.step===1){RS();return pick(R.boss1);}
+ 
+  /* ─ ГЭМ БУРУУ ─ */
+  if(/гэмших|миний буруу|чадаагүй|тусалж чадаагүй/.test(t)){
+    if(CS.topic!=='guilt'){CS={topic:'guilt',step:1,last:t};return pick(R.guilt0);}
+  }
+  if(CS.topic==='guilt'&&CS.step===1){RS();return pick(R.guiltR);}
+ 
+  /* ─ ТУСГААРЛАЛТ ─ */
+  if(/хэнтэй ч яримааргүй|ганцаараа байх|зугтмаар|хүмүүсээс залхаж/.test(t)){
+    if(CS.topic!=='social'){CS={topic:'social',step:1,last:t};return pick(R.social0);}
+  }
+  if(CS.topic==='social'&&CS.step===1){RS();return pick(R.socialR);}
+ 
+  return pick(R.fallback);
+}
+</script>
+</body>
+</html>
+ 

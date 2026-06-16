@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8" />
+  <title>Сэтгэл зүйчийн туслах | СОНГИНОХАЙРХАН ДҮҮРГИЙН ЦАГДААГИЙН ГАЗАР</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .container { width: 100%; max-width: 450px; background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
+    .screen { padding: 35px; text-align: center; display: none; flex-direction: column; min-height: 550px; box-sizing: border-box; }
+    .active { display: flex; }
+    .logo-container { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; }
+    .logo { width: 180px; height: auto; object-fit: contain; }
+    h1 { font-size: 18px; color: #1a3a5f; margin-bottom: 25px; text-transform: uppercase; font-weight: 800; }
+    label { font-weight: 600; display: block; margin-bottom: 12px; text-align: left; color: #444; font-size: 14px; }
+    select { width: 100%; padding: 10px; border: 2px solid #e0e6ed; border-radius: 12px; font-size: 14px; outline: none; transition: border-color 0.3s; background-color: #f8fafc; }
+    select:focus { border-color: #1a73e8; }
+    .button-group { display: flex; justify-content: center; width: 100%; margin-top: 25px; gap: 12px; }
+    .btn-next { width: 100%; padding: 16px; font-size: 18px; border-radius: 12px; background-color: #1a73e8; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    .btn-next:hover { background-color: #1557b0; }
+    .select-list { height: 220px !important; margin-bottom: 20px; }
+    .btn { flex: 1; padding: 14px; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: bold; border: none; transition: 0.3s; }
+    .btn-back { background-color: #718096; color: white; }
+    #chat-screen { padding: 0; }
+    .chat-header { background: #1a3a5f; color: white; padding: 18px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; }
+    #chatbox { flex: 1; padding: 15px; overflow-y: auto; background: #f4f7f6; display: flex; flex-direction: column; gap: 10px; height: 400px; }
+    .message { padding: 12px 16px; border-radius: 18px; max-width: 80%; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+    .bot { background: white; align-self: flex-start; border: 1px solid #e2e8f0; border-bottom-left-radius: 2px; }
+    .user { background: #1a73e8; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #edf2f7; }
+    input { flex: 1; padding: 12px 18px; border: 1px solid #e2e8f0; border-radius: 25px; outline: none; background: #f8fafc; }
+    
+    /* Цагаан сарын товчлуурын стиль */
+    .holiday-btn { 
+      padding: 10px 15px; 
+      border-radius: 20px; 
+      border: 2px solid #e74c3c; 
+      background: white; 
+      color: #e74c3c; 
+      cursor: pointer; 
+      font-weight: bold; 
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+    .holiday-btn:hover { background: #e74c3c; color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="step1" class="screen active">
+      <div class="logo-container"><img src="police.png" alt="Logo" class="logo"></div>
+      <h1>Сонгинохайрхан дүүргийн цагдаагийн газар</h1>
+      <label>1. Харьяа хэлтсээ сонгоно уу:</label>
+      <select id="heltesSelect">
+        <option value="" disabled selected>-- Сонгох --</option>
+        <option value="Нэгдүгээр хэлтэс">СХД-ийн Цагдаагийн 1-р хэлтэс</option>
+        <option value="Хоёрдугаар хэлтэс">СХД-ийн Цагдаагийн 2-р хэлтэс</option>
+        <option value="Гуравдугаар хэлтэс">СХД-ийн Цагдаагийн 3-р хэлтэс</option>
+        <option value="Цагдаагийн газар">СХД-ийн Цагдаагийн газар</option>
+      </select>
+      <div class="button-group"><button class="btn-next" onclick="goToStep2()">Дараах</button></div> 
+    </div>
+    <div id="step2" class="screen">
+      <div class="logo-container"><img src="police.png" alt="Logo" class="logo"></div>
+      <h1>Тасаг сонгох</h1>
+      <label>2. Тасагаа сонгоно уу:</label>
+      <select id="tasagSelect" size="6" class="select-list">
+        <option value="ЭЦТ">Эрүүгийн цагдаагийн тасаг (ЭЦТ)</option>
+        <option value="МШТ">Мөрдөн шалгах тасаг (МШТ)</option>
+        <option value="ГХЗШТ">Гэмт хэрэг, зөрчил шалгах тасаг (ГХЗШТ)</option>
+        <option value="УСШУТ">Урьдчилан сэргийлэх тасаг (УСШУТ)</option>
+        <option value="НХЖХОНАБХТ">НХЖХОНАБХТ</option>
+        <option value="ЗУТ">ЗУТ</option>
+      </select>
+      <div class="button-group">
+        <button class="btn btn-back" onclick="backToStep1()">Буцах</button>
+        <button class="btn btn-next" onclick="startChat()">Нэвтрэх</button>
+      </div>
+    </div>
+    <div id="chat-screen" class="screen">
+      <div class="chat-header">
+        <span id="info-display">СХД</span>
+        <span style="cursor:pointer" onclick="location.reload()">🔄</span>
+      </div>
+      <div id="chatbox"></div>
+      <div class="input-area">
+        <input id="inputBox" type="text" placeholder="Асуултаа бичнэ үү..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button onclick="sendMessage()" style="border:none; background:none; color:#1a73e8; font-weight:bold; cursor:pointer;">Илгээх</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let heltes = "";
+    let tasag = "";
+    function goToStep2() {
+      heltes = document.getElementById('heltesSelect').value;
+      if (!heltes) return alert("Хэлтэс сонгоно уу!");
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step2').classList.add('active');
+    }
+    function backToStep1() {
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('step1').classList.add('active');
+    }
+    function startChat() {
+      tasag = document.getElementById('tasagSelect').value;
+      if (!tasag) return alert("Тасаг сонгоно уу!");
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('chat-screen').classList.add('active');
+      document.getElementById('info-display').innerText = heltes + " | " + tasag;
+      
+      // Мэндчилгээний текст болон Цагаан сарын товчлуур нэмэх
+      const welcomeHTML = `
+        Сайн байна уу? <b>${tasag}</b>-ийн алба хаагч танд энэ өдрийн мэнд хүргэе. <br><br>
+        <b>Санамж:</b> Та асуултаа <b>кирил үсгээр</b> бичнэ үү. <br><br>
+        <button class="holiday-btn" onclick="sendQuickMsg('Цагаан сар')">🏮 Цагаан сарын баярын өдрүүдэд алба хаагчдад өгч буй сэтгэл зүйн зөвлөмж, ДАРНА УУ</button>
+      `;
+      addMessage(welcomeHTML, "bot");
+    }
+    function addMessage(text, sender) {
+      const chatbox = document.getElementById('chatbox');
+      const div = document.createElement("div");
+      div.className = `message ${sender}`;
+      div.innerHTML = text;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+    // Товчлуур дээр дарахад ажиллах функц
+    function sendQuickMsg(msg) {
+      addMessage(msg, "user");
+      const reply = getBotReply(msg);
+      setTimeout(() => addMessage(reply, "bot"), 500);
+    }
+    function sendMessage() {
+      const inputBox = document.getElementById('inputBox');
+      const userInput = inputBox.value.trim();
+      if (!userInput) return;
+      addMessage(userInput, "user");
+      inputBox.value = '';
+      const reply = getBotReply(userInput);
+      setTimeout(() => addMessage(reply, "bot"), 500);
+    }
+    function getBotReply(input) {
+        const text = input.toLowerCase().trim();
+// 1.1 Цагаан сар ба Баярын үеийн зөвлөгөө (Олон хувилбартай)
+if (text.includes("цагаан сар") || text.includes("баяр") || text.includes("түгжрэл")) {
+            const holidayReplies = [
+                "🏮 **Зөвлөгөө 1: Сэтгэл зүйн хуяг** <br><br>• **Хөөсөн хуяг:** Олон хүнтэй харилцахдаа өөрийгөө тойрсон 'хамгаалалтын бүрхүүл' байна гэж төсөөл. Бусдын уурыг өөртөө битгий наа. <br>• **Микро амралт:** 2-хон минут нүдээ аниад гүнзгий амьсгал авч өөрийгөө 'цэнэглээлээрэй. Алба хаагчдад түгээмэл илэрдэг сэтгэл зүйн шинжийг мэдэхийг хүсэж байвал 1 гэж бичээрэй.",
+                
+                "🏮 **Зөвлөгөө 2: Тэвчээр ба Хүч** <br><br>• **4-7-8 дасгал:** Хэрэв сандарч, ачаалал ихэсвэл 4 секунд амьсгал аваад, 7 секунд түгжиж, 8 секунд гаргаарай. <br>• **Бахархал:** Таны ачаар иргэд айх аюулгүй баярлаж байгааг санаж, өөрөөрөө бахархаарай. Та бол жинхэнэ баатар!",
+                
+                "🏮 **Зөвлөгөө 3: Гэр бүл ба Алба** <br><br>• **Шилжилт:** Ажлаа тараад гэртээ орохдоо 'Цагдаа' дүрээсээ гарч, 'Хайртай аав/ээж, хань' дүрдээ шилжээрэй. <br>• **Эрчим:** Баярын ачаалал түр зуурынх. Маргааш та амрах болно гэдгээ өөртөө сануулж, эрч хүчээ нөөцөл."
+            ]
+            // Санамсаргүйгээр нэг хариултыг сонгох
+            return holidayReplies[Math.floor(Math.random() * holidayReplies.length)];
+        }
+// Цагаан сарын ээлжинд гарч буй алба хаагчдын шинж тэмдэг
+if (text.includes("шинж тэмдэг") && (text.includes("цагаан сар") || text.includes("баяр"))) {
+    const symptomReplies = [
+        "🏮 **Хувилбар 1: Сэтгэл хөдлөлийн шинжүүд** \n\n" +
+        "Баяраар ээлжинд гарахад: \n" +
+        "• Гэр бүлээсээ тусгаарлагдсан мэдрэмж төрөх \n" +
+        "• Амархан бухимдах, тэвчээр алдах \n" +
+        "• Бусдын баярлаж байгааг хараад дотроо харамсах мэдрэмж төрөх нь хэвийн үзэгдэл юм.",
+        "🏮 **Хувилбар 2: Бие махбодийн хариу үйлдэл** \n\n" +
+        "Өндөржүүлсэн бэлэн байдлын үед: \n" +
+        "• Нойр тогтворгүйжих, байнга зүүдлэх \n" +
+        "• Анхаарал төвлөрөлт буурах \n" +
+        "• Зүрх дэлсэх, мөр хүзүү хөших зэрэг стрессийн физиологийн шинжүүд илэрч болно.",
+        "🏮 **Хувилбар 3: Харилцааны өөрчлөлт** \n\n" +
+        "Ачааллын үеэр илрэх шинжүүд: \n" +
+        "• Хамтран ажиллагсадтайгаа үл ойлголцох \n" +
+        "• Иргэдтэй харилцахдаа сэтгэл хөдлөлгүй (хөшүүн) болох \n" +
+        "• Хэт сонор сэрэмжтэй байснаас болж амрах үедээ ч тайвширч чадахгүй байх."
+    ];
+    
+    return symptomReplies[Math.floor(Math.random() * symptomReplies.length)];
+}
+// Нийтийн эмх замбараагүй байдлын үед өөртөө туслах аргууд
+if (text.includes("нийтийн") || text.includes("эмх замбараагүй") || text.includes("жагсаал")) {
+    const crisisReplies = [
+        "📢 **Хувилбар 1: 'Газардуулга' буюу Одоо цагт ирэх техник (5-4-3-2-1 арга)** \n\n" +
+        "Олон хүний шуугиан, эмх замбараагүй байдалд тархи сандарч эхэлбэл: \n" +
+        "• **Харж болох 5 зүйл:** Эргэн тойрныхоо өөр өөр өнгө, хэлбэртэй 5 зүйлийг нэрлэ. \n" +
+        "• **Сонсож болох 3 чимээ:** Хүмүүсийн хашхираанаас өөр чимээг (машины дуу, салхи г.м) ялгаж сонс. \n" +
+        "• **Мэдэрч болох 1 зүйл:** Гутлын тань ул газар яаж хүрч байгааг эсвэл мөрдэс тань мөрөн дээр яаж дарагдаж байгааг мэдэр. \n" +
+        "💡 *Энэ нь таныг айдсаас салгаж, одоо байгаа бодит байдалд төвлөрүүлнэ.*",
+        "📢 **Хувилбар 2: Сэтгэл хөдлөлийг 'Хайрцаглах' техник (Tactical Breathing)** \n\n" +
+        "Энэ аргыг тусгай хүчнийхэн стрессийг шууд бууруулахад ашигладаг: \n" +
+        "• **4 секунд:** Хамраараа гүнзгий амьсгал ав. \n" +
+        "• **4 секунд:** Амьсгалаа түгж. \n" +
+        "• **4 секунд:** Амгалан байдлаар амнаасаа гарга. \n" +
+        "• **4 секунд:** Дахин амьсгал авахын өмнө хүлээ. \n" +
+        "💡 *Энэ дасгал нь цусан дахь кортизолыг (стрессийн даавар) бууруулж, зүрхний цохилтыг тогтворжуулна.*",
+        "📢 **Хувилбар 3: Дотоод харилцааны 'Код' ашиглах** \n\n" +
+        "Хүмүүс таны руу дайрч, доромжилж байх үед: \n" +
+        "• **'Би бол хад' техник:** Өөрийгөө долгион цохиж буй хад гэж төсөөл. Хүмүүсийн үг бол зүгээр л усны цацрал. Тэд таныг биш, таны дүрэмт хувцсыг л харж байгааг сана. \n" +
+        "• **Утга учир сануулах:** 'Миний үүрэг бол хамгаалах' гэсэн өгүүлбэрийг дотроо давт. Энэ нь таныг сэтгэл хөдлөлөөр бус, мэргэжлийн түвшинд хариу үйлдэл үзүүлэхэд тусална."
+    ];
+    
+    return crisisReplies[Math.floor(Math.random() * crisisReplies.length)];
+}
+        // 1. Мэндчилгээ
+        if (text.includes("сайн уу") || text.includes("мэнд")) {
+            return "Сайн байна уу? Цагдаагийн сэтгэл зүйн туслах байна. Танд юугаар туслах вэ? Танд ажлын ачаалал, нойр эсвэл сэтгэл зүйн тусламж хэрэгтэй байна уу?";
+        }
+        // 2. Халшрах, ядрах (Burnout)
+        const burnoutKeywords = ["ядрах", "хэцүү", "стресс", "ядарч байна", "хэцүү байна", "халшрах"];
+        if (burnoutKeywords.some(word => text.includes(word))) {
+            return "Танд хэцүү байгааг ойлгож байна, надад хандсанд баярлалаа. Чи ганцаараа биш шүү. Энэ байдал танд хэзээнээс мэдрэгдсэн бэ? Хэрэв 6 сараас дээш хугацаанд үргэлжилж байгаа бол сэтгэл зүйчтэй уулзахыг зөвлөж байна. Танд 'дасгал' хэрэгтэй байна уу, эсвэл 'зөвлөгөө' үү?";
+        }
+        // 3. Уур бухимдал
+        const angerKeywords = ["уур", "бухимдал", "тэсэхгүй", "дургүй хүрэх", "уурлаж"];
+        if (angerKeywords.some(word => text.includes(word))) {
+            return "Ажлын байран дээрх маргаан, иргэдийн харилцаа таныг бухимдуулж байна уу? Уурлах нь хүний хэвийн мэдрэмж боловч буруу гадагшлуулбал аюултай. Та яг одоо '4-7-8' амьсгалын дасгал туршиж үзэх үү? (4 сек авах, 7 сек түгжих, 8 сек гаргах). Энэ нь тархины уурлах төвийг шууд тайвшруулдаг.";
+        }
+        // 4. Нойрны асуудал
+        const sleepKeywords = ["нойр", "унтаж", "сэрээд", "нойргүй"];
+        if (sleepKeywords.some(word => text.includes(word))) {
+            return "Ээлжийн ажил нойрны хэмнэлийг алдагдуулдаг. Зөвлөгөө: 1. Унтахаас 1 цагийн өмнө бүх дэлгэцээ унтраа. 2. Өрөөгөө бүрэн харанхуй болго. 3. Хэрэв 20 минутаас дээш хугацаанд унтаж чадахгүй бол босож өөр өрөөнд суугаад, нойр хүрэх үед буцаж хэвтээрэй.";
+        }
+        // 5. Шинж тэмдэг таних
+        const symptomKeywords = ["шинж", "яаж мэддэг", "ямар байдаг", "мэдрэмж"];
+        if (symptomKeywords.some(word => text.includes(word))) {
+            return "Гол шинжүүд: Байнгын ядарсан мэдрэмж төрөх, ажилдаа дургүй болох, амархан бухимдах, өөрийгөө голох, нойр муудах. Хэрэв эдгээр шинж илэрч байвал 'тусламж' гэж бичээрэй.";
+        }
+        // 6. Дасгал
+        const exerciseKeywords = ["дасгал", "яаж тайвшрах"];
+        if (exerciseKeywords.some(word => text.includes(word))) {
+            return "1. Шилжилтийн дасгал: Ажлаа тараад гэрийн гадна 5-10 минут машиндаа сууж 'алба хаагч'-аас 'гэр бүлийн гишүүн' рүү шилжих сэтгэл зүйн бэлтгэл хий. 2. He Gu иллэг: Долоовор болон эрхий хурууны голд 2 минут иллэг хий. Энэ нь стрессийг шууд бууруулна.";
+        }
+        // 7. Тусламж болон Сэтгэл зүйчтэй холбогдох
+        const supportKeywords = ["тусламж", "сэтгэл зүйч", "цаг авах", "зөвлөгөө", "ярилцъя", "холбогдох", "уулзах"];
+        if (supportKeywords.some(word => text.includes(word))) {
+            return "Тайван гүнзгий амьсгал аваарай. Сэтгэл зүйдээ анхаарал хандуулах нь мэргэжлийн хариуцлага юм. Та зөвлөгөө авах цаг товлох уу? (Сэтгэл зүйн албаны утас: 7011-XXXX)";
+        }
+        // 8. Цагдаагийн сэтгэл зүйчийн тухай
+        if (text.includes("цагдаа") && (text.includes("хэн") || text.includes("юу хийдэг"))) {
+            return "Цагдаагийн сэтгэл зүйч нь алба хаагчдын ажлын чадамжийг дэмжих, сэтгэл зүйн гэмтлээс (PTSD) сэргийлэх, гэр бүлийн харилцаанд нь дэмжлэг үзүүлэх үүрэгтэй.";
+        }
+        // 9. Сэтгэл зүйн гэмтэл ба Хүнд үзэгдэл
+        const traumaKeywords = ["хэрэг", "осол", "хэцүү дүр зураг", "нүдэнд харагдаад", "аймшигтай"];
+        if (traumaKeywords.some(word => text.includes(word))) {
+            return "Хүнд нөхцөл байдал, осол хэргийн газар ажилласны дараа тухайн дүр зураг нүдэнд харагдах, зүүдлэгдэх нь 'Цочролын дараах стресс'-ийн шинж байж болно. Зөвлөгөө: 1. Болсон явдлыг итгэлтэй хамт ажиллагсадтайгаа ярилцаж 'гадагшлуул'. 2. Өөртөө 'Би үүргээ гүйцэтгэсэн, би тусалсан' гэж хэлж тайвшруул. Хэрэв энэ мэдрэмж 1 сараас дээш үргэлжилбэл заавал сэтгэл зүйчид хандаарай.";
+        }
+        // 10. Гэр бүлийн харилцаа
+        const familyKeywords = ["гэр бүл", "эхнэр", "нөхөр", "хүүхэд", "ойлгохгүй", "маргаан"];
+        if (familyKeywords.some(word => text.includes(word))) {
+            return "Цагдаагийн алба хаагчдын ар гэр тэдний хамгийн том багана байдаг. Ажлын стрессээ гэртээ гаргахгүй байхын тулд 'Гэрийн босго давах' дүрмийг баримтлаарай. Гэртээ орохоосоо өмнө бүх сөрөг бодлоо машиндаа эсвэл гудамжинд 'үлдээж', хайртай хүмүүстээ зөвхөн 'өөрийгөө' зориул.";
+        }
+        // 11. Мотиваци
+        const motivationKeywords = ["утгагүй", "хэрэггүй", "яах гэж", "итгэлгүй", "чадахгүй"];
+        if (motivationKeywords.some(word => text.includes(word))) {
+            return "Таны хийж буй ажил бол нийгмийн амар амгалангийн төлөөх маш чухал үүрэг. Таны ачаар өнөөдөр хэн нэгэн аюулгүй унтаж байгаа. Та бол баатар шүү!";
+        }
+        // 12. Паник
+        const panicKeywords = ["амьсгал боогдох", "зүрх дэлсэх", "айдас", "үхэх юм шиг"];
+        if (panicKeywords.some(word => text.includes(word))) {
+            return "Яг одоо '5-4-3-2-1' аргыг ашиглаарай: Харж болох 5 зүйл, барьж болох 4 зүйл, сонсож болох 3 чимээ, үнэрлэж болох 2 үнэр, амталж болох 1 зүйлийг нэрлэ. Энэ нь таныг одоо цагт авчирна.";
+        }
+        // 13. Стресс гадагшлуулах
+        const ventingKeywords = ["стресс гадагшлуулах", "яаж гаргах", "дотор бачуураад", "хэцүү байна"];
+        if (ventingKeywords.some(word => text.includes(word))) {
+            return "Стрессийг гадагшлуулах аргууд: 1. Биеийн хүч (гүйх, хашхирах), 2. Бичиж гаргах, 3. Хүйтэн усаар нүүрээ угаах. Та өнөөдөр ямар нэг байдлаар стрессээ гаргаж чадсан уу?";
+        }
+        // 14. Өөртөө итгэх итгэл
+        const selfLoveKeywords = ["өөртөө итгэх", "өөрийгөө голж", "би муу байна", "итгэл алдарч"];
+        if (selfLoveKeywords.some(word => text.includes(word))) {
+            const affirmations = [
+                "Өнөөдөр та чадах бүхнээ хийсэн, та үнэхээр сайн ажиллалаа.",
+                "Таны өмссөн мөрдэс бол таны хүч чадал, тэвчээрийн илэрхийлэл.",
+                "Та өөрийгөө хайрлаж, амраах эрхтэй хүн."
+            ];
+            let randomAff = affirmations[Math.floor(Math.random() * affirmations.length)];
+            return randomAff + " Та яг одоо өөртөө 'Би чадлаа' гэж хэлж чадах уу?";
+        }
+        // 15. Гэнэтийн цочрол
+        if (text.includes("харагдаад") || text.includes("зүүдлэгдээд")) {
+            return "Энэ бол таны тархи хүнд мэдээллийг боловсруулж байгаа хэлбэр юм. Зөвлөгөө: Одоо байгаа цаг хугацаагаа мэдрэхийн тулд хөлийнхөө улаар газар хүчтэй гишгэж, эргэн тойрон дахь 3 өөр өнгийг нэрлээрэй.";
+        }
+        // 17. Архи
+        const alcoholKeywords = ["архи", "пиво", "уумаар", "тайвшрах гэж", "архи ууж"];
+        if (alcoholKeywords.some(word => text.includes(word))) {
+            return "Стрессээ тайлахын тулд согтууруулах ундаа хэрэглэх нь түр зуурын 'мэдээ алдуулалт' боловч маргааш нь илүү их түгшүүрт оруулна. Түүний оронд 15 минут хурдан алхаж үзээрэй.";
+        }
+        // 18. Ажил ба Амралт
+        const workLifeKeywords = ["амарч чадахгүй", "ажлаа бодоод", "утас дугараад", "чөлөөгүй"];
+        if (workLifeKeywords.some(word => text.includes(word))) {
+            return "Амрах бол 'залхуурал' биш, харин 'цэнэглэлт' юм. Яг одоо утсаа 30 минут далд тавиад дуртай зүйлээ хийх боломж байна уу?";
+        }
+        // 19. Харилцааны стресс
+        const citizenKeywords = ["хэрүүл", "доромжлол", "хүн амьтан", "дайрч байна", "хэл амаар"];
+        if (citizenKeywords.some(word => text.includes(word))) {
+            return "Хүмүүс таны хувь хүн рүү биш, таны дүрэмт хувцас руу дайрч байгааг санаарай. Дотроо '10-аас 1 хүртэл' ухрааж тоолоод амьсгаагаа гаргаарай.";
+        }
+        // 21. Хөшүүн болох
+        const traumaShieldKeywords = ["юу ч мэдрэхгүй", "хайхрамжгүй", "хүйтэн", "дургүй хүрэх"];
+        if (traumaShieldKeywords.some(word => text.includes(word))) {
+            return "Таны сэтгэл өөрийгөө хамгаалахын тулд 'хуяг' өмсөж байна. Ажлын дараа заавал 'сэтгэл зүйн угаагч' (хөгжим сонсох, байгальд суух) хийгээрэй.";
+        }
+        // Тест
+        if (text.includes("тест") || text.includes("шалгая")) {
+            return "Сэтгэл зүйн оношилгоо эхэллээ. Та дараах асуултуудад 1-5 хүртэл оноо өгөөрэй (1-Огт үгүй, 5-Маш их):\n1. Утсаа байн байн шалгадаг уу?\n2. Огцом уурлаж байна уу?\n3. Архи уух хүсэл төрж байна уу?\nХариултаа 'Оноо: 15' гэх мэтээр бичээрэй.";
+        }
+        if (text.includes("оноо")) {
+            let scoreMatch = text.match(/\d+/);
+            if (scoreMatch) {
+                let score = parseInt(scoreMatch[0]);
+                if (score > 12) {
+                    return "Таны стрессийн түвшин ӨНДӨР байна. Архи болон бусад хорт зуршлаас хол байж, яаралтай амралт авна уу.";
+                } else {
+                    return "Таны стресс хэвийн байна. Гэхдээ өөрийгөө амраахаа бүү мартаарай.";
+                }
+            }
+        }
+// 22. Шүүмжлэл болон Удирдах ажилтантай харилцах
+const bossKeywords = ["дарга", "тушаал", "шүүмжлэл", "ажлын ачаалал", " шударга бус"];
+        if (bossKeywords.some(word => text.includes(word))) {
+            return "Удирдах ажилтны шүүмжлэл эсвэл ажлын шахалт хэцүү санагдаж байна уу? Зөвлөгөө: 1. Шүүмжлэлийг хувь хүн рүүгээ биш, ажилдаа өгч буй засвар гэж харахыг хичээ. 2. Хэрэв хэт их ачаалалтай байгаа бол 'Би энэ ажлыг чанартай хийхийн тулд надад хэдий хугацаа хэрэгтэй вэ?' гэж бодож, боломжит хугацаагаа хэлж сураарай.";
+        }
+        // 23. Гэм буруугийн мэдрэмж (Duty Failure)
+        const guiltKeywords = ["гэмших", "би чадаагүй", "миний буруу", "амжаагүй", "тусалж чадаагүй"];
+        if (guiltKeywords.some(word => text.includes(word))) {
+            return "Цагдаагийн албанд бүх зүйлийг хянах боломжгүй байдаг. Та тухайн үед өөрийн нөөц боломж, мэдлэгийн хүрээнд хамгийн сайнаараа хичээсэн гэдгээ санаарай. Өөрийгөө буруутгахын оронд 'Дараагийн удаа би юун дээр анхаарах вэ?' гэж асуух нь сэтгэл зүйн хувьд илүү эрүүл хандлага юм.";
+        }
+        // 24. Харилцаанаас тусгаарлагдах (Social Withdrawal)
+        const socialKeywords = ["хэнтэй ч яримааргүй", "ганцаараа байх", "зугтмаар", "хүмүүсээс залхаж"];
+        if (socialKeywords.some(word => text.includes(word))) {
+            return "Ажлын байран дээр хэт их хүнтэй харилцсанаас болж 'Харилцааны туйлдал'-д орсон байна. Энэ нь та өөрийгөө хамгаалж буй хэлбэр юм. Зөвлөгөө: Өөртөө 30-60 минут 'Чимээгүй цаг' гарга. Хэнтэй ч ярихгүй, зөвхөн дуртай зүйлээ хийх нь таныг буцааж цэнэглэх болно.";
+        }
+        // 25. PTSD - Гэнэтийн айдас (Trigger)
+        const triggerKeywords = ["цочих", "гэнэт айх", "дуу чимээнээс", "машины дуут дохио"];
+        if (triggerKeywords.some(word => text.includes(word))) {
+            return "Ажлын онцлогоос болоод таны тархи байнгын 'Аюулын дохио' (Alert mode) горимд орсон байна. Дуут дохио эсвэл огцом чимээнд цочиж байвал: Яг одоо хоёр хөлөө газарт бат гишгэж, өөрийнхөө байгаа газрыг ажигла. 'Би одоо аюулгүй газар байна' гэж өөртөө хэлээрэй.";
+        }
+        // 26. Ажлын утга учир алдагдах (Compassion Fatigue)
+        const meaningKeywords = ["яах гэж", "утгагүй", "бүгд л адилхан", "өөрчлөгдөхгүй"];
+        if (meaningKeywords.some(word => text.includes(word))) {
+            return "Таны хийж буй жижиг үйлдэл ч нийгмийн нэг хэсэгт амар амгалан авчирч байдаг. Та өнөөдөр ядаж нэг хүний аюулгүй байдлыг хангаж чадсан уу? Хэрэв тийм бол та үүргээ маш сайн биелүүлсэн байна. Таны хөдөлмөр үнэ цэнэтэй шүү.";
+        }
+        // ОЙЛГОХГҮЙ БОЛ...
+        return "Уучлаарай, би таныг сайн ойлгосонгүй. Та 'ядарч байна', 'уур хүрч байна', 'нойр хүрэхгүй байна' эсвэл 'дасгал' гэх мэтээр бичиж үзнэ үү.";
+    }
+</script>
